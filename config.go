@@ -120,6 +120,16 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
 
+		real_prefix, err := os.Readlink("/tmp/gentoo")
+
+		if err == nil {
+			for i, path := range config.WhitelistPrefix {
+				if strings.HasPrefix(path, "/tmp/gentoo") {
+					config.WhitelistPrefix[i] = real_prefix + strings.TrimPrefix(path, "/tmp/gentoo")
+				}
+			}
+		}
+
 		for _, path := range tomlConf.Whitelist.Exact {
 			if !strings.HasSuffix(path, "/.envrc") {
 				path = filepath.Join(path, ".envrc")
